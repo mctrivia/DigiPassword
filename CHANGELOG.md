@@ -1,3 +1,10 @@
-## [0.0.1] - TODO: Add release date.
+## [1.0.1] - 2019-03-24.
 
-* TODO: Describe initial release.
+* Initial publish to github
+
+
+## [1.0.2] - 2019-06-20.
+
+* Allowed web browser plugin to return longer then needed OTP key
+* Published all custom dependencies
+* Publish to pub.dev

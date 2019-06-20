@@ -1,9 +1,11 @@
 import 'package:bitcoin_flutter/bitcoin_flutter.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
-import 'package:bip39/src/wordlists/english.dart';
+import 'package:bip39_multi/src/wordlists/english.dart';
 import 'package:bs58check/bs58check.dart' as base58;
 import 'package:hex/hex.dart';
+import 'dart:typed_data';
+import 'package:http/http.dart';
 
 
 
@@ -163,6 +165,51 @@ class DigiPassword {
     //3 bits for symbol
     //total 67
     return parts.join();
+  }
+
+  Future<bool> postPassword(String domain,String uri) async {
+    if (_hdWallet==null) throw("DigiPassword not initialized");
+
+    //decode uri and validate
+    final Map<String,String> params=Uri.parse(uri).queryParameters;
+    if (params["s"]==null || params["x"]==null || params["p"]==null) throw("Invalid URI");
+    if (params["s"].length<44) throw("OTP key invalid");
+    Uint8List key;
+    try {
+      key=HEX.decode(params["s"]);
+    } catch(_) {
+      throw("OTP key invalid");
+    }
+    final String callback="https://${params['p']}";
+    final String nonce=params["x"];
+    if (nonce.length<10) throw("Invalid nonce");
+
+    //get initial values
+    List<int> hash=_getHash(domain);
+    int index=_getIndex(hash);
+    String path=_getPath(hash,13)+"/"+index.toString()+"'";
+
+    //calculate sudo random number
+    HDWallet hdWallet = _hdWallet.derivePath(path);
+    String address = hdWallet.address;
+    var rnd = base58.decode(address).sublist(1); //rnd=pubkeyhash which is 20 bytes of sudo random data
+
+    //add 2 byte config variable to end of rnd
+    int config=3;
+    Uint8List payload=Uint8List(22);
+    payload.setRange(0, 20, rnd);
+    payload.setRange(20,22,[(config/256).floor(),config%256]);  //break each byte of config up and add to rnd
+
+    //encrypt rnd and config
+    for (int i=0;i<22;i++) {
+      payload[i]^=key[i];
+    }
+
+    var client = new Client();
+    Response response=await client.post(callback, body: {"x": nonce, "p": HEX.encode(payload)}).timeout(Duration(seconds: 30),onTimeout: () {
+      return Response("Timeout",500);//if takes more then 30 seconds fail
+    });  //send data to server
+    return (response.statusCode==200 || response.statusCode==201);
   }
 
 }

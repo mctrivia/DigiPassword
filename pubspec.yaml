@@ -1,8 +1,8 @@
 name: digi_password
 description: DigiPassword Library
-version: 0.0.1
-author:
-homepage:
+version: 1.0.2
+author: Matthew Cornelisse <squarerootofnegativeone@gmail.com>
+homepage: https://github.com/mctrivia/DigiPassword
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -10,13 +10,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  bitcoin_flutter: ^1.0.7
+  http: ^0.12.0+1
+  bip39_multi: ^1.0.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  bitcoin_flutter: ^1.0.6
-  http: ^0.12.0+1
-  sqflite: ^1.1.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
