@@ -170,7 +170,7 @@ class DigiPassword {
       pass='';
       for (int i=0;i<original.length;i++) {
         if ((!found) || (original[i] != symbol)) pass = pass + original[i];
-        if (original[i] != symbol) found = true;
+        if (original[i] == symbol) found = true;
       }
     }
 
