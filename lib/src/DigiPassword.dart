@@ -122,7 +122,9 @@ class DigiPassword {
 */
   ///Password Generator
   ///Generates a 67bit deterministic password for any given value of domain
-  String password(String domain) {
+  String password(String domain,{
+    short=false
+  }) {
     if (_hdWallet==null) throw("DigiPassword not initialized");
 
     //get initial values
@@ -143,6 +145,7 @@ class DigiPassword {
       if (part >= 0x8000)
         word = word.substring(0, 1).toUpperCase() +
             word.substring(1); //upper case if msb is 1
+      if (short) word=word.substring(0,4);
       parts.add(word);
       parts.add("");
     }
@@ -153,18 +156,30 @@ class DigiPassword {
       parts[i] = symbol;
     }
 
-    //add a 10 bit number in any of the 4 spaces
+    //add a 10 bit number in any of the 4 spaces(3 digits for short
     int part = rnd[8] * 0x100 + rnd[9];
-    int num = part % 1024;
+    int num = part % ((short)?1000:1024);
     int loc = (part ~/ 0x4000) * 2 + 1;
     parts[loc] = num.toString();
+
+    //if short version only keep first instance of symbol
+    String pass=parts.join();
+    if (short) {
+      String original=pass;
+      bool found=false;
+      pass='';
+      for (int i=0;i<original.length;i++) {
+        if ((!found) || (original[i] != symbol)) pass = pass + original[i];
+        if (original[i] != symbol) found = true;
+      }
+    }
 
     //13*4 bits four word parts
     //10 bits for number
     //2 bits for location of number
     //3 bits for symbol
     //total 67
-    return parts.join();
+    return pass;
   }
 
   Future<bool> postPassword(String domain,String uri) async {
