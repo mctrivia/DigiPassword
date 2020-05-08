@@ -26,7 +26,7 @@ String domain="user entered domain like google or bank";
 String password=await digiPassword.password(domain);
 
 //to transmit a password to a browser plugin 
-// for example https://chrome.google.com/webstore/detail/digi-idantumid-easy-exten/bnnpdbkedgbfbmnoihaallekiiaffjhi?hl=en
+// https://chrome.google.com/webstore/detail/antumid-mydigipassword/kkabnooiepelolejnmeclfklkadiojhd?hl=en
 //String domain="duplicated from above for clarity";
 String uri="value provided by browser widget.  Usually encoded in a QR code"
 bool passed=false;
